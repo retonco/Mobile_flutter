@@ -1,8 +1,48 @@
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final pesquisa = TextEditingController();
+
+  String? mensagemErro;
+  String? termoPesquisado;
+
+  void pesquisar() {
+    String texto = pesquisa.text.trim();
+
+    setState(() {
+      if (texto.isEmpty) {
+        mensagemErro = 'Digite o nome de uma receita para pesquisar.';
+      } else {
+        mensagemErro = null;
+        termoPesquisado = texto;
+      }
+    });
+
+    if (texto.isEmpty) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Pesquisa realizada: $texto'),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    pesquisa.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,11 +53,10 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF278F8B),
         elevation: 0, //sem sombra
-        title: const Text(
+        title: Text(
           'Be Our Guest',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            //fontSize: 30,
           ),
         ),
       ),
@@ -29,71 +68,86 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Encontre sua próxima receita',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF303030),
-                      ),
-                    ),
-
-                    SizedBox(height: 8),
-
-                    Text(
-                      'Ideias deliciosas para o seu dia.',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
 
               // Pesquisa visual
               TextField(
+                controller: pesquisa,
                 decoration: InputDecoration(
-                  hintText: 'Buscar receitas...',
-                  // Ícone de lupa à esquerda
+                  labelText: 'Pesquisar pelo nome da receita', //identifica o campo
+                  labelStyle: const TextStyle(
+                    color: Colors.black,
+                  ),
+
+                  hintText: 'Ex.: Pizza Margherita',
+
+                  errorText: mensagemErro,
                   prefixIcon: const Icon(
                     Icons.search,
                     color: Color(0xFF278F8B),
                   ),
-                  filled: true,
-                  fillColor: const Color(0xFFF8F8F8),
+
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12), // bordas arredondadas
-                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF36A39F),
+                    ),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF36A39F),
+                      width: 2,
+                    ),
+                  ),
+                ),
+                onChanged: (valor) {
+                  setState(() {
+                    mensagemErro = null;
+                    termoPesquisado = null;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 10),
+
+              ElevatedButton(
+                onPressed: pesquisar,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4DB6AC),
+                  foregroundColor: Colors.white,
+                ),
+                child: Text('Pesquisar',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                   ),
                 ),
               ),
 
-              const SizedBox(height: 28),
+              Text(
+                termoPesquisado == null
+                    ? ''
+                    : 'Termo pesquisado: $termoPesquisado',
+              ),
 
-              const Text(
+              const SizedBox(height: 10),
+
+              Text(
                 'Receitas para você',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 21,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF303030),
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 30),
 
               // Receitas de exemplo
               const ReceitaCard(
@@ -118,6 +172,14 @@ class HomePage extends StatelessWidget {
                 dificuldade: 'Fácil',
                 avaliacao: '4.9',
                 imagem: 'https://cdn.dummyjson.com/recipe-images/3.webp',
+              ),
+
+              const ReceitaCard(
+                nome: 'Bruschetta de tomate e manjericão',
+                tempo: '25 min',
+                dificuldade: 'Fácil',
+                avaliacao: '4.7',
+                imagem: 'https://cdn.dummyjson.com/recipe-images/7.webp',
               ),
             ],
           ),
@@ -166,6 +228,8 @@ class ReceitaCard extends StatelessWidget {
     required this.imagem,
   });
 
+
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -191,7 +255,7 @@ class ReceitaCard extends StatelessWidget {
               children: [
                 Text(
                   nome,
-                  style: const TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF303030),
@@ -202,8 +266,8 @@ class ReceitaCard extends StatelessWidget {
 
                 Text(
                   '$tempo · $dificuldade',
-                  style: const TextStyle(
-                    fontSize: 13,
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
                     color: Colors.grey,
                   ),
                 ),
@@ -220,8 +284,9 @@ class ReceitaCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       avaliacao,
-                      style: const TextStyle(
-                        fontSize: 13,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+
                         color: Color(0xFF555555),
                       ),
                     ),
